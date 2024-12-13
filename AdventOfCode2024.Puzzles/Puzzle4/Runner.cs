@@ -16,6 +16,16 @@ public class Runner
         actual.Should().Be(expected);
     }
 
+    [Theory]
+    [InlineData("TestInput", 9)]
+    [InlineData("Input", 1864)]
+    public void RunBeta(string filename, int expected)
+    {
+        var wordSearch = Execute(filename);
+        var actual = wordSearch.CountXmas();
+        actual.Should().Be(expected);
+    }
+
     public sealed class WordSearch
     {
         private readonly string[] _contents;
@@ -47,6 +57,37 @@ public class Runner
             }
 
             return count;
+        }
+
+        public int CountXmas()
+        {
+            var count = 0;
+            for (var y = _top; y <= _bottom; y++)
+            {
+                for (var x = _left; x <= _right; x++)
+                {
+                    count += CountXmasAtPosition(x, y);
+                }
+            }
+
+            return count;
+        }
+
+        private int CountXmasAtPosition(int x, int y)
+        {
+            if (GetChar(x, y) != 'A')
+            {
+                return 0;
+            }
+
+            var ul2br =
+                GetChar(x - 1, y - 1) == 'M' && GetChar(x + 1, y + 1) == 'S' ||
+                GetChar(x - 1, y - 1) == 'S' && GetChar(x + 1, y + 1) == 'M';
+            var bl2ur =
+                GetChar(x - 1, y + 1) == 'M' && GetChar(x + 1, y - 1) == 'S' ||
+                GetChar(x - 1, y + 1) == 'S' && GetChar(x + 1, y - 1) == 'M';
+
+            return ul2br && bl2ur ? 1 : 0;
         }
 
         private int CountWordsAtPosition(string word, int x, int y)
